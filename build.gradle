@@ -1,0 +1,41 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    apply from: 'versions.gradle'
+
+    addRepos(repositories)
+
+    dependencies {
+        classpath android_gradle
+        classpath kotlin_gradle
+    }
+}
+
+plugins {
+    id "com.diffplug.gradle.spotless" version "3.28.1"
+}
+
+allprojects {
+    addRepos(repositories)
+}
+
+subprojects {
+    apply plugin: 'com.diffplug.gradle.spotless'
+    spotless {
+        kotlin {
+            target '**/*.kt'
+            ktlint(versions.vektlintVersion).userData([
+                    "disabled_rules"      : "no-wildcard-imports",
+                    "insert_final_newline": "false",
+                    "max_line_length"     : "off",
+            ])
+            trimTrailingWhitespace()
+            indentWithSpaces()
+        }
+    }
+
+    if (project.hasProperty("kapt")) {
+        kapt {
+            useBuildCache = true
+        }
+    }
+}

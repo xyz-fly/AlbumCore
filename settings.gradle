@@ -1,0 +1,3 @@
+rootProject.name = "AlbumCore"
+include ':core'
+include ':sample'

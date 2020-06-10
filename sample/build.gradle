@@ -1,0 +1,62 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    viewBinding.enabled = true
+
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.leon.album"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    kapt rootProject.glide_compiler
+
+    implementation rootProject.kotlin_stdlib
+    implementation rootProject.kotlinx_coroutines_core
+    implementation rootProject.kotlinx_coroutines_android
+
+    implementation rootProject.androidx_core
+    implementation rootProject.androidx_activity
+    implementation rootProject.androidx_appcompat
+
+    implementation rootProject.androidx_recyclerview
+    implementation rootProject.androidx_constraintlayout
+    implementation rootProject.androidx_paging
+
+    implementation rootProject.glide_core
+
+    implementation project(path: ':core')
+
+    testImplementation rootProject.junit
+
+    androidTestImplementation rootProject.androidx_test_core
+    androidTestImplementation rootProject.androidx_test_core_ktx
+    androidTestImplementation rootProject.androidx_test_arch_core
+    androidTestImplementation rootProject.androidx_test_junit
+    androidTestImplementation rootProject.androidx_test_junit_ktx
+
+
+}
