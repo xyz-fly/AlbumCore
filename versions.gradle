@@ -40,6 +40,7 @@ versions.glide = '4.11.0'
 
 //
 versions.vektlintVersion = '0.36.0'
+versions.mavenPublishVersion = '0.11.1'
 
 ext.versions = versions
 
@@ -48,6 +49,7 @@ ext.versions = versions
 
 ext {
     android_gradle = "com.android.tools.build:gradle:4.0.0"
+    maven_publish_plugin = "com.vanniktech:gradle-maven-publish-plugin:$versions.mavenPublishVersion"
 
     // kotlin
     kotlin_gradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlinVersion"

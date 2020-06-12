@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.leon.album"
-        minSdkVersion rootProject.minSdkVersion
+        minSdkVersion 17
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 1
         versionName "1.0"
