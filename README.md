@@ -12,7 +12,7 @@ A fast media loader library depend on androidx-paging without UI widget for Andr
 So just add the dependency to your project build.gradle file:
 ```groovy
 dependencies {
-    implementation 'com.github.xyz-fly:albumcore:0.9.0'
+    implementation 'com.github.xyz-fly:albumcore:0.9.1'
     // it need depend on androidx-paging for new features
     implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
 }
@@ -33,7 +33,7 @@ Create a loader by loadmanager and set DirectoryCallback as callback like this:
 // For a simple directory list
 LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
     this,
-    MediaTypeSelection().media().video().create()
+    MediaTypeSelection.Builder().image().video().create()
 ) {
     override fun onLoadComplete(
         loader: Loader<Cursor>,
@@ -47,14 +47,13 @@ LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
 ## Get media
 - 1: Create a RecyclerView and PagedListAdapter.  
 - 2: Create a Factory of Paging-DataSource by AlbumFactory.getAlbumDataSource.  
-- 3: Get media data by directory-id (get all of media when directory-id is -1).   
+- 3: Get media data by directory-id (get all of media when directory-id is 0).
 Simple use cases will look something like this:   
 ```kotlin
 // For a simple image list
 AlbumFactory.getAlbumDataSource(
     this,
-    id, // this is directory-id
-    MediaTypeSelection().media().video().create()
+    MediaTypeSelection.Builder().setBucketId(id).image().video().create()
 ).toLiveData(
     config = config, // this is PagedList.Config
     boundaryCallback = object : PagedList.BoundaryCallback<AlbumMedia>() {

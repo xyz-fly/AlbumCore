@@ -5,18 +5,18 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import androidx.loader.content.CursorLoader
 import com.leon.album.core.AlbumMedia
+import com.leon.album.core.MediaTypeSelection
 
 internal class DirectoryCursorLoader(
     context: Context,
-    types: IntArray,
-    sort: String = Storage.DEFAULT_ORDER_BY
+    selection: MediaTypeSelection
 ) : CursorLoader(
     context,
     Storage.URI,
     Storage.DIRECTORY_PROJECTION,
-    AlbumUtils.getMediaTypeSelection(types),
-    AlbumUtils.getMediaTypeSelectionArgs(types),
-    sort
+    selection.getSelection(),
+    selection.getSelectionArgs(),
+    selection.sortOrder
 ) {
 
     override fun onLoadInBackground(): Cursor? {

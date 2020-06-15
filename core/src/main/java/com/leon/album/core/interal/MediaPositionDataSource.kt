@@ -1,22 +1,20 @@
-package com.leon.album.core
+package com.leon.album.core.interal
 
 import android.content.Context
 import android.database.Cursor
-import com.leon.album.core.interal.AlbumUtils
-import com.leon.album.core.interal.ContentResolverPositionDataSource
-import com.leon.album.core.interal.Storage
+import com.leon.album.core.AlbumMedia
+import com.leon.album.core.MediaTypeSelection
 
-class MediaPositionDataSource(
+internal class MediaPositionDataSource(
     context: Context,
-    bucketId: Long,
-    types: IntArray,
+    selection: MediaTypeSelection,
     sortOrder: String = Storage.DEFAULT_ORDER_BY
 ) : ContentResolverPositionDataSource<AlbumMedia>(
     context,
     Storage.URI,
     Storage.MEDIA_PROJECTION,
-    AlbumUtils.getBucketIdAndMediaTypeSelection(bucketId, types),
-    AlbumUtils.getBucketIdAndMediaTypeSelectionArgs(bucketId, types),
+    selection.getSelection(),
+    selection.getSelectionArgs(),
     sortOrder
 ) {
 

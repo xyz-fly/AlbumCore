@@ -9,7 +9,7 @@ import com.leon.album.core.interal.DirectoryCursorLoader
 
 abstract class DirectoryCallback(
     private val context: Context,
-    private val types: IntArray
+    private val selection: MediaTypeSelection
 ) : LoaderManager.LoaderCallbacks<Cursor> {
 
     private var isLoadFinish = false
@@ -18,7 +18,7 @@ abstract class DirectoryCallback(
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
         isLoadFinish = false
-        return DirectoryCursorLoader(context, types)
+        return DirectoryCursorLoader(context, selection)
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {

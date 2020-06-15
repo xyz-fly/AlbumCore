@@ -49,7 +49,7 @@ class AlbumActivity : AppCompatActivity() {
 
         LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
             this,
-            MediaTypeSelection().media().video().create()
+            MediaTypeSelection.Builder().image().video().create()
         ) {
             override fun onLoadComplete(
                 loader: Loader<Cursor>,
@@ -59,7 +59,7 @@ class AlbumActivity : AppCompatActivity() {
                 val count = list.sumBy { it.count }
 
                 val allDirectory = AlbumDirectory(
-                    -1L,
+                    0L,
                     "All of Media",
                     "",
                     null,
@@ -79,8 +79,7 @@ class AlbumActivity : AppCompatActivity() {
     private fun submitList(id: Long) {
         AlbumFactory.getAlbumDataSource(
             this,
-            id,
-            MediaTypeSelection().media().video().create()
+            MediaTypeSelection.Builder().setBucketId(id).image().video().create()
         ).toLiveData(
             config = config,
             boundaryCallback = object : PagedList.BoundaryCallback<AlbumMedia>() {
