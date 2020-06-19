@@ -12,7 +12,7 @@ A fast media loader library depend on androidx-paging without UI widget for Andr
 So just add the dependency to your project build.gradle file:
 ```groovy
 dependencies {
-    implementation 'com.github.xyz-fly:albumcore:0.9.1'
+    implementation 'com.github.xyz-fly:albumcore:0.9.2'
     // it need depend on androidx-paging for new features
     implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
 }
@@ -23,7 +23,6 @@ A sample project which provide runnable code examples
 ## Permission
 Add the permission to your project manifests, and request permissions in your activity:
 ```xml
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 ```
 
@@ -60,6 +59,16 @@ AlbumFactory.getAlbumDataSource(
     }).observe(this, Observer {
     // submit list by PagedListAdapter
 })
+```
+
+## Filter media format
+Filters items by an Array, or Ignore items by an Array
+```kotlin
+MediaTypeSelection.Builder()
+    .setBucketId(id)
+    .image(filter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP))
+    .video(ignore = arrayOf(MimeType.VIDEO_AVI))
+    .create()
 ```
 
 # License

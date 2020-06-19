@@ -21,8 +21,12 @@ dependencies {
     implementation rootProject.androidx_core
     implementation rootProject.androidx_appcompat
 
-    implementation rootProject.androidx_paging
+    api rootProject.androidx_paging
 
     testImplementation rootProject.junit
-
+    androidTestImplementation rootProject.androidx_test_core
+    androidTestImplementation rootProject.androidx_test_arch_core
+    androidTestImplementation rootProject.androidx_test_junit
+    androidTestImplementation rootProject.androidx_test_espresso_core
+    androidTestImplementation rootProject.androidx_test_espresso_contrib
 }

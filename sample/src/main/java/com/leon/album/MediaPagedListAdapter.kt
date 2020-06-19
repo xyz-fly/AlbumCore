@@ -35,7 +35,7 @@ class MediaPagedListAdapter(val glide: RequestManager) :
                 glide.load(it.uri).into(binding.image)
                 binding.name.text = (position + 1).toString()
                 binding.content.text =
-                    "w=${albumMedia.width}\nh=${albumMedia.height}\nsize=${albumMedia.size}\ndate=${getDate(albumMedia.dateAdded * 1000)}\ndur=${albumMedia.duration}"
+                    "type=${albumMedia.mimeType}\nw=${albumMedia.width}\nh=${albumMedia.height}\nsize=${albumMedia.size}\ndate=${getDate(albumMedia.dateAdded * 1000)}\ndur=${albumMedia.duration}"
 
                 binding.ivPlay.visibility = if (albumMedia.mimeType.contains("video")) {
                     View.VISIBLE

@@ -7,15 +7,14 @@ import com.leon.album.core.MediaTypeSelection
 
 internal class MediaPositionDataSource(
     context: Context,
-    selection: MediaTypeSelection,
-    sortOrder: String = Storage.DEFAULT_ORDER_BY
+    selection: MediaTypeSelection
 ) : ContentResolverPositionDataSource<AlbumMedia>(
     context,
     Storage.URI,
     Storage.MEDIA_PROJECTION,
     selection.getSelection(),
     selection.getSelectionArgs(),
-    sortOrder
+    selection.sortOrder
 ) {
 
     override fun convertRows(cursor: Cursor): List<AlbumMedia> {

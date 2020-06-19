@@ -13,11 +13,7 @@ object AlbumFactory {
     ): Factory<Int, AlbumMedia> {
         return object : Factory<Int, AlbumMedia>() {
             override fun create(): DataSource<Int, AlbumMedia> {
-                return MediaPositionDataSource(
-                    context,
-                    selection,
-                    selection.sortOrder
-                )
+                return MediaPositionDataSource(context, selection)
             }
         }
     }

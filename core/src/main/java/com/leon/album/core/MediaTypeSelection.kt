@@ -5,7 +5,7 @@ import com.leon.album.core.interal.Storage
 
 class MediaTypeSelection(
     private val bucketId: Long,
-    private val map: HashMap<Int, Array<String>?>,
+    private val map: HashMap<Int, Pair<Array<String>?, Array<String>?>>,
     val sortOrder: String
 ) {
 
@@ -16,24 +16,38 @@ class MediaTypeSelection(
 
         var selection = ""
 
-        map.values.forEachIndexed { index, filer ->
+        map.values.forEachIndexed { index, pair ->
             var mediaSelection = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
-            filer?.takeIf { it.isNotEmpty() }?.let {
+            // add filter
+            val filter = pair.first
+            filter?.takeIf { it.isNotEmpty() }?.let {
                 var filterSelection = ""
-                if (it.size == 1) {
-                    filterSelection = "${MediaStore.Files.FileColumns.MIME_TYPE}=?"
-                } else {
-                    it.forEachIndexed { index, _ ->
-                        filterSelection += if (index == it.size - 1) {
-                            "${MediaStore.Files.FileColumns.MIME_TYPE}=?"
-                        } else {
-                            "${MediaStore.Files.FileColumns.MIME_TYPE}=? or "
-                        }
+                it.forEachIndexed { index, _ ->
+                    filterSelection += if (index == it.size - 1) {
+                        "${MediaStore.Files.FileColumns.MIME_TYPE}=?"
+                    } else {
+                        "${MediaStore.Files.FileColumns.MIME_TYPE}=? or "
                     }
                 }
 
                 filterSelection = if (it.size == 1) filterSelection else "($filterSelection)"
                 mediaSelection = "($mediaSelection and $filterSelection)"
+            }
+
+            // add ignore
+            val ignore = pair.second
+            ignore?.takeIf { it.isNotEmpty() }?.let {
+                var ignoreSelection = ""
+                it.forEachIndexed { index, _ ->
+                    ignoreSelection += if (index == it.size - 1) {
+                        "${MediaStore.Files.FileColumns.MIME_TYPE}!=?"
+                    } else {
+                        "${MediaStore.Files.FileColumns.MIME_TYPE}!=? and "
+                    }
+                }
+
+                ignoreSelection = if (it.size == 1) ignoreSelection else "($ignoreSelection)"
+                mediaSelection = "($mediaSelection and $ignoreSelection)"
             }
 
             selection += if (index != map.size - 1) "$mediaSelection or " else mediaSelection
@@ -57,20 +71,26 @@ class MediaTypeSelection(
 
         map.entries.forEach { entry ->
             args += arrayOf(entry.key.toString())
-            if (entry.value?.isNotEmpty() == true) {
-                args += entry.value!!
+
+            // add filter args
+            entry.value.first?.takeIf { it.isNotEmpty() }?.let {
+                args += it
+            }
+            // add ignore args
+            entry.value.second?.takeIf { it.isNotEmpty() }?.let {
+                args += it
             }
         }
         return args
     }
 
     override fun toString(): String {
-        return "selection = ${getSelection()} \nselectionArgs = ${getSelectionArgs().contentToString()}"
+        return "selection = ${getSelection()} order by $sortOrder\nselectionArgs = ${getSelectionArgs().contentToString()}"
     }
 
     class Builder {
         private var bucketId = 0L
-        private val map = HashMap<Int, Array<String>?>()
+        private val map = HashMap<Int, Pair<Array<String>?, Array<String>?>>()
         private var sortOrder: String = Storage.DEFAULT_ORDER_BY
 
         fun setBucketId(bucketId: Long): Builder {
@@ -78,18 +98,18 @@ class MediaTypeSelection(
             return this
         }
 
-        fun image(filter: Array<String>? = null): Builder {
-            addMedia(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE, filter)
+        fun image(filter: Array<String>? = null, ignore: Array<String>? = null): Builder {
+            addMedia(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE, filter, ignore)
             return this
         }
 
-        fun video(filter: Array<String>? = null): Builder {
-            addMedia(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO, filter)
+        fun video(filter: Array<String>? = null, ignore: Array<String>? = null): Builder {
+            addMedia(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO, filter, ignore)
             return this
         }
 
-        fun addMedia(mediaType: Int, filter: Array<String>? = null): Builder {
-            map[mediaType] = filter
+        fun addMedia(mediaType: Int, filter: Array<String>? = null, ignore: Array<String>? = null): Builder {
+            map[mediaType] = filter to ignore
             return this
         }
 

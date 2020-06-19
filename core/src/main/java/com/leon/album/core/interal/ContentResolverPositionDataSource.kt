@@ -28,7 +28,7 @@ abstract class ContentResolverPositionDataSource<T>(
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<T>) {
         var list = emptyList<T>()
 
-        var firstLoadPosition = 0
+        val firstLoadPosition: Int
         cancellationSignal = CancellationSignal()
 
         try {

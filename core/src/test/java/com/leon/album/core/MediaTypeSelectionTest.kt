@@ -8,65 +8,93 @@ import org.junit.Test
 class MediaTypeSelectionTest {
 
     @Test
-    fun getMediaTypeSelectionTest() {
-        // select all media
-        var mediaTypeSelection = MediaTypeSelection.Builder().image().video().create()
-        var expect =
+    fun mediaTypeSelectionNoSelectTest() {
+        val mediaTypeSelection = MediaTypeSelection.Builder().create()
+        val expect = "${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = emptyArray<String>()
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaTest() {
+        val mediaTypeSelection = MediaTypeSelection.Builder().image().video().create()
+
+        // test select
+        val expect =
             "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? or ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        var argExpect = arrayOf(
+        // test select args
+        val argExpect = arrayOf(
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
-        // select image
-        mediaTypeSelection = MediaTypeSelection.Builder().image().create()
-        expect = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.MediaColumns.SIZE}>0"
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionImageTest() {
+        val mediaTypeSelection = MediaTypeSelection.Builder().image().create()
+
+        val expect = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
+        val argExpect = arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString())
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionVideoTest() {
         // select video
-        mediaTypeSelection = MediaTypeSelection.Builder().video().create()
-        expect = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.MediaColumns.SIZE}>0"
+        val mediaTypeSelection = MediaTypeSelection.Builder().video().create()
+        val expect = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
+        val argExpect = arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString())
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
-        // select all media and bucket id
-        mediaTypeSelection = MediaTypeSelection.Builder().setBucketId(10L).image().video().create()
-        expect =
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaWithBucketIdTest() {
+        val bucketId = 10L
+        val mediaTypeSelection = MediaTypeSelection.Builder().setBucketId(bucketId).image().video().create()
+
+        // test select
+        val expect =
             "${Storage.COLUMN_BUCKET_ID}=? and (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? or ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(
-            10L.toString(),
+        // test select args
+        val argExpect = arrayOf(
+            bucketId.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
-        // no select
-        mediaTypeSelection = MediaTypeSelection.Builder().create()
-        expect = "${MediaStore.MediaColumns.SIZE}>0"
-        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+        println(mediaTypeSelection)
+    }
 
-        argExpect = emptyArray()
-        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
-
-        // select all media filter format
-        var imageFilter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP)
-        var videoFilter = arrayOf(MimeType.VIDEO_MP4, MimeType.VIDEO_AVI)
-        mediaTypeSelection = MediaTypeSelection.Builder().image(imageFilter).video(videoFilter).create()
-        expect =
+    @Test
+    fun mediaTypeSelectionAllMediaFilterTest() {
+        val imageFilter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP)
+        val videoFilter = arrayOf(MimeType.VIDEO_MP4, MimeType.VIDEO_AVI)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image(imageFilter).video(videoFilter).create()
+        val expect =
             "((${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?)) or (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?))) and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(
+        val argExpect = arrayOf(
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             *imageFilter,
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
@@ -74,33 +102,150 @@ class MediaTypeSelectionTest {
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
-        // select all media filter image format
-        imageFilter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP)
-        mediaTypeSelection = MediaTypeSelection.Builder().image(imageFilter).video().create()
-        expect =
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaImageFilterTest() {
+        val imageFilter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image(imageFilter).video().create()
+        val expect =
             "((${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?)) or ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(
+        val argExpect = arrayOf(
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             *imageFilter,
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
 
-        // select video filter format and bucket id
-        videoFilter = arrayOf(MimeType.VIDEO_MP4, MimeType.VIDEO_AVI)
-        mediaTypeSelection = MediaTypeSelection.Builder().setBucketId(10).video(videoFilter).create()
-        expect =
-            "${Storage.COLUMN_BUCKET_ID}=? and (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaVideoFilterTest() {
+        val videoFilter = arrayOf(MimeType.VIDEO_MP4, MimeType.VIDEO_AVI)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image().video(videoFilter).create()
+        val expect =
+            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? or (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?))) and ${MediaStore.MediaColumns.SIZE}>0"
         Assert.assertEquals(expect, mediaTypeSelection.getSelection())
 
-        argExpect = arrayOf(
-            10L.toString(),
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
             *videoFilter
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionImageFilterTest() {
+        val imageFilter = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG, MimeType.IMAGE_WEBP)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image(imageFilter).create()
+        val expect =
+            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            *imageFilter
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionVideoFilterTest() {
+        val videoFilter = arrayOf(MimeType.VIDEO_MP4, MimeType.VIDEO_AVI)
+        val mediaTypeSelection = MediaTypeSelection.Builder().video(videoFilter).create()
+        val expect =
+            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}=? or ${MediaStore.Files.FileColumns.MIME_TYPE}=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
+            *videoFilter
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaIgnoreTest() {
+        val imageIgnore = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG)
+        val videoIgnore = arrayOf(MimeType.VIDEO_AVI)
+        val mediaTypeSelection =
+            MediaTypeSelection.Builder().image(ignore = imageIgnore).video(ignore = videoIgnore).create()
+        val expect =
+            "((${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}!=? and ${MediaStore.Files.FileColumns.MIME_TYPE}!=?)) or (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.Files.FileColumns.MIME_TYPE}!=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            *imageIgnore,
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
+            *videoIgnore
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaImageIgnoreTest() {
+        val imageIgnore = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image(ignore = imageIgnore).video().create()
+        val expect =
+            "((${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}!=? and ${MediaStore.Files.FileColumns.MIME_TYPE}!=?)) or ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            *imageIgnore,
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionAllMediaVideoIgnoreTest() {
+        val videoIgnore = arrayOf(MimeType.VIDEO_AVI)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image().video(ignore = videoIgnore).create()
+        val expect =
+            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? or (${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and ${MediaStore.Files.FileColumns.MIME_TYPE}!=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
+            *videoIgnore
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaTypeSelectionImageIgnoreTest() {
+        val imageIgnore = arrayOf(MimeType.IMAGE_JPG, MimeType.IMAGE_PNG)
+        val mediaTypeSelection = MediaTypeSelection.Builder().image(ignore = imageIgnore).create()
+        val expect =
+            "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? and (${MediaStore.Files.FileColumns.MIME_TYPE}!=? and ${MediaStore.Files.FileColumns.MIME_TYPE}!=?)) and ${MediaStore.MediaColumns.SIZE}>0"
+        Assert.assertEquals(expect, mediaTypeSelection.getSelection())
+
+        val argExpect = arrayOf(
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            *imageIgnore
+        )
+        Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
         println(mediaTypeSelection)
     }
 }
