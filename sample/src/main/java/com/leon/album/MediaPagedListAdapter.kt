@@ -4,7 +4,7 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
@@ -12,8 +12,8 @@ import com.leon.album.core.AlbumMedia
 import com.leon.album.databinding.ListItemAlbumBinding
 import java.util.*
 
-class MediaPagedListAdapter(val glide: RequestManager) :
-    PagedListAdapter<AlbumMedia, MediaPagedListAdapter.ItemViewHolder>(CALLBACK) {
+class MediaPagedListAdapter(private val glide: RequestManager) :
+    PagingDataAdapter<AlbumMedia, MediaPagedListAdapter.ItemViewHolder>(CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder(
@@ -35,7 +35,9 @@ class MediaPagedListAdapter(val glide: RequestManager) :
                 glide.load(it.uri).into(binding.image)
                 binding.name.text = (position + 1).toString()
                 binding.content.text =
-                    "type=${albumMedia.mimeType}\nw=${albumMedia.width}\nh=${albumMedia.height}\nsize=${albumMedia.size}\ndate=${getDate(albumMedia.dateAdded * 1000)}\ndur=${albumMedia.duration}"
+                    "type=${albumMedia.mimeType}\nw=${albumMedia.width}\nh=${albumMedia.height}\nsize=${albumMedia.size}\ndate=${getDate(
+                        albumMedia.dateAdded * 1000
+                    )}\ndur=${albumMedia.duration}"
 
                 binding.ivPlay.visibility = if (albumMedia.mimeType.contains("video")) {
                     View.VISIBLE

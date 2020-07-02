@@ -3,14 +3,20 @@ package com.leon.album
 import android.database.Cursor
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
-import androidx.paging.PagedList
-import androidx.paging.toLiveData
+import androidx.paging.*
 import com.bumptech.glide.Glide
 import com.leon.album.core.*
 import com.leon.album.databinding.ActivityAlbumBinding
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 
 class AlbumActivity : AppCompatActivity() {
 
@@ -18,13 +24,33 @@ class AlbumActivity : AppCompatActivity() {
 
     private lateinit var adapter: MediaPagedListAdapter
 
-    private val config = PagedList.Config.Builder()
-        .setEnablePlaceholders(false)
-        .setInitialLoadSizeHint(16)
-        .setPageSize(16)
-        .setPrefetchDistance(8)
-        .build()
+    private val config = PagingConfig(
+        pageSize = 20,
+        prefetchDistance = 8,
+        enablePlaceholders = false,
+        initialLoadSize = 20
+    )
 
+    private val clearListCh = Channel<Unit>(Channel.CONFLATED)
+    private val albumMediaId = MutableLiveData<Long>()
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private val posts = flowOf(
+        clearListCh.consumeAsFlow().map { PagingData.empty<AlbumMedia>() },
+        albumMediaId.asFlow().flatMapLatest {
+            Pager(config) {
+                AlbumFactory.getAlbumPagingSource(
+                    this,
+                    MediaTypeSelection.Builder().setBucketId(it).image().video().create()
+                )
+            }.flow.onStart {
+                // let clearListCh emit empty-list first
+                delay(1L)
+            }
+        }
+    ).flattenMerge(2)
+
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,6 +72,12 @@ class AlbumActivity : AppCompatActivity() {
 
         adapter = MediaPagedListAdapter(Glide.with(this))
         binding.recyclerView.adapter = adapter
+
+        lifecycleScope.launchWhenCreated {
+            posts.collectLatest {
+                adapter.submitData(it)
+            }
+        }
 
         LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
             this,
@@ -77,15 +109,7 @@ class AlbumActivity : AppCompatActivity() {
     }
 
     private fun submitList(id: Long) {
-        AlbumFactory.getAlbumDataSource(
-            this,
-            MediaTypeSelection.Builder().setBucketId(id).image().video().create()
-        ).toLiveData(
-            config = config,
-            boundaryCallback = object : PagedList.BoundaryCallback<AlbumMedia>() {
-            }).observe(this, Observer {
-            adapter.submitList(null)
-            adapter.submitList(it)
-        })
+        clearListCh.offer(Unit)
+        albumMediaId.value = id
     }
 }

@@ -12,9 +12,9 @@ A fast media loader library depend on androidx-paging without UI widget for Andr
 So just add the dependency to your project build.gradle file:
 ```groovy
 dependencies {
-    implementation 'com.github.xyz-fly:albumcore:0.9.2'
+    implementation 'com.github.xyz-fly:albumcore:0.9.3'
     // it need depend on androidx-paging for new features
-    implementation 'androidx.paging:paging-runtime-ktx:2.1.2'
+    implementation 'androidx.paging:paging-runtime-ktx:3.0.0-alpha02'
 }
 ```
 # Sample usage
@@ -44,21 +44,37 @@ LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
 ```
 
 ## Get media
-- 1: Create a RecyclerView and PagedListAdapter.  
-- 2: Create a Factory of Paging-DataSource by AlbumFactory.getAlbumDataSource.  
+- 1: Create RecyclerView and PagingDataAdapter.
+- 2: Create a Pager by AlbumFactory, then create a flow to submit list data
 - 3: Get media data by directory-id (get all of media when directory-id is 0).
 Simple use cases will look something like this:   
 ```kotlin
 // For a simple image list
-AlbumFactory.getAlbumDataSource(
-    this,
-    MediaTypeSelection.Builder().setBucketId(id).image().video().create()
-).toLiveData(
-    config = config, // this is PagedList.Config
-    boundaryCallback = object : PagedList.BoundaryCallback<AlbumMedia>() {
-    }).observe(this, Observer {
-    // submit list by PagedListAdapter
-})
+
+private val clearListCh = Channel<Unit>(Channel.CONFLATED)
+private val albumMediaId = MutableLiveData<Long>()
+
+private val posts = flowOf(
+    clearListCh.consumeAsFlow().map { PagingData.empty<AlbumMedia>() },
+    albumMediaId.asFlow().flatMapLatest {
+        Pager(config) {
+            AlbumFactory.getAlbumPagingSource(
+                this,
+                MediaTypeSelection.Builder().setBucketId(it).image().video().create()
+            )
+        }.flow.onStart {
+            // let clearListCh emit empty-list first
+            delay(1L)
+        }
+    }
+).flattenMerge(2)
+
+//
+lifecycleScope.launchWhenCreated {
+    posts.collectLatest {
+        adapter.submitData(it)
+    }
+}
 ```
 
 ## Filter media format
@@ -70,6 +86,10 @@ MediaTypeSelection.Builder()
     .video(ignore = arrayOf(MimeType.VIDEO_AVI))
     .create()
 ```
+
+## Paging
+albumcore:0.9.2 support to Paging2
+albumcore:0.9.3 support to Paging3
 
 # License
 

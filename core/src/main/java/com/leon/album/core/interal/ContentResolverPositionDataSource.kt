@@ -10,7 +10,10 @@ import androidx.core.os.CancellationSignal
 import androidx.paging.PositionalDataSource
 import java.lang.ref.WeakReference
 
-abstract class ContentResolverPositionDataSource<T>(
+/**
+ * @see [androidx.room.paging.LimitOffsetDataSource]
+ */
+abstract class ContentResolverPositionDataSource<T : Any>(
     private val context: Context,
     private val uri: Uri,
     private val projection: Array<String>,
