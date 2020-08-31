@@ -9,7 +9,7 @@ import com.leon.album.core.interal.Storage
 
 data class AlbumMedia(
     val id: Long,
-    val name: String,
+    val name: String?,
     val mimeType: String,
     val uri: Uri,
     val dateAdded: Long,
