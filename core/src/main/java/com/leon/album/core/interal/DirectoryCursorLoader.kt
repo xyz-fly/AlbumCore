@@ -75,7 +75,7 @@ internal class DirectoryCursorLoader(
 
     private class Director(
         val bucketId: Long,
-        val bucketName: String,
+        val bucketName: String?,
         val media: AlbumMedia,
         var count: Int // sum of media
     )

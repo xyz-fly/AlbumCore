@@ -26,8 +26,7 @@ class AlbumActivity : AppCompatActivity() {
 
     private val config = PagingConfig(
         pageSize = 20,
-        prefetchDistance = 8,
-        enablePlaceholders = false,
+        prefetchDistance = 20,
         initialLoadSize = 20
     )
 
