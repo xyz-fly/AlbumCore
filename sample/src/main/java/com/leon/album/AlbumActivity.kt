@@ -35,7 +35,7 @@ class AlbumActivity : AppCompatActivity() {
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private val posts = flowOf(
-        clearListCh.consumeAsFlow().map { PagingData.empty<AlbumMedia>() },
+        clearListCh.receiveAsFlow().map { PagingData.empty<AlbumMedia>() },
         albumMediaId.asFlow().flatMapLatest {
             Pager(config) {
                 AlbumFactory.getAlbumPagingSource(

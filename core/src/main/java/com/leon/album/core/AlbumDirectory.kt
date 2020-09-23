@@ -6,7 +6,7 @@ import com.leon.album.core.interal.Storage
 
 data class AlbumDirectory(
     val bucketId: Long,
-    val bucketName: String,
+    val bucketName: String?,
     val mimeType: String,
     val albumMedia: AlbumMedia?,
     val count: Int
