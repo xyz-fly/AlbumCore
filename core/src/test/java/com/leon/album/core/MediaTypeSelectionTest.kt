@@ -2,6 +2,7 @@ package com.leon.album.core
 
 import android.provider.MediaStore
 import com.leon.album.core.interal.Storage
+import java.util.concurrent.TimeUnit
 import org.junit.Assert
 import org.junit.Test
 
@@ -245,6 +246,23 @@ class MediaTypeSelectionTest {
             *imageIgnore
         )
         Assert.assertArrayEquals(argExpect, mediaTypeSelection.getSelectionArgs())
+
+        println(mediaTypeSelection)
+    }
+
+    @Test
+    fun mediaCustomSelectionTest() {
+        val selection = "${MediaStore.Video.Media.DURATION} >= ?"
+        val selectionArgs = arrayOf(
+            TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES).toString()
+        )
+        var mediaTypeSelection = MediaTypeSelection.Builder().selection(selection, selectionArgs).create()
+        Assert.assertEquals(selection, mediaTypeSelection.getSelection())
+        Assert.assertArrayEquals(selectionArgs, mediaTypeSelection.getSelectionArgs())
+
+        mediaTypeSelection = MediaTypeSelection.Builder().image().video().selection(selection, selectionArgs).create()
+        Assert.assertEquals(selection, mediaTypeSelection.getSelection())
+        Assert.assertArrayEquals(selectionArgs, mediaTypeSelection.getSelectionArgs())
 
         println(mediaTypeSelection)
     }

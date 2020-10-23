@@ -16,11 +16,8 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation rootProject.kotlin_stdlib
-    implementation rootProject.androidx_core
-    implementation rootProject.androidx_appcompat
-
+    api rootProject.kotlin_stdlib
+    api rootProject.androidx_appcompat
     api rootProject.androidx_paging
 
     testImplementation rootProject.junit

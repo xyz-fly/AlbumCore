@@ -3,13 +3,22 @@ package com.leon.album.core
 import android.provider.MediaStore
 import com.leon.album.core.interal.Storage
 
+/**
+ * look at: https://developer.android.google.cn/training/data-storage/shared/media#media-location-permission
+ */
 class MediaTypeSelection(
     private val bucketId: Long,
-    private val map: HashMap<Int, Pair<Array<String>?, Array<String>?>>,
+    private val map: Map<Int, Pair<Array<String>?, Array<String>?>>? = null,
+    private val selection: Pair<String, Array<String>>? = null,
     val sortOrder: String
 ) {
 
     fun getSelection(): String {
+        // if selection is not null, it will be used as query selection
+        if (selection != null) return selection.first
+
+        val map = map ?: emptyMap()
+
         if (map.isEmpty()) {
             return "${MediaStore.MediaColumns.SIZE}>0"
         }
@@ -24,9 +33,9 @@ class MediaTypeSelection(
                 var filterSelection = ""
                 it.forEachIndexed { index, _ ->
                     filterSelection += if (index == it.size - 1) {
-                        "${MediaStore.Files.FileColumns.MIME_TYPE}=?"
+                        "${MediaStore.MediaColumns.MIME_TYPE}=?"
                     } else {
-                        "${MediaStore.Files.FileColumns.MIME_TYPE}=? or "
+                        "${MediaStore.MediaColumns.MIME_TYPE}=? or "
                     }
                 }
 
@@ -40,9 +49,9 @@ class MediaTypeSelection(
                 var ignoreSelection = ""
                 it.forEachIndexed { index, _ ->
                     ignoreSelection += if (index == it.size - 1) {
-                        "${MediaStore.Files.FileColumns.MIME_TYPE}!=?"
+                        "${MediaStore.MediaColumns.MIME_TYPE}!=?"
                     } else {
-                        "${MediaStore.Files.FileColumns.MIME_TYPE}!=? and "
+                        "${MediaStore.MediaColumns.MIME_TYPE}!=? and "
                     }
                 }
 
@@ -63,13 +72,15 @@ class MediaTypeSelection(
     }
 
     fun getSelectionArgs(): Array<String> {
+        if (selection != null) return selection.second
+
         var args: Array<String> = arrayOf()
 
         if (bucketId != 0L) {
             args += arrayOf(bucketId.toString())
         }
 
-        map.entries.forEach { entry ->
+        map?.entries?.forEach { entry ->
             args += arrayOf(entry.key.toString())
 
             // add filter args
@@ -90,7 +101,8 @@ class MediaTypeSelection(
 
     class Builder {
         private var bucketId = 0L
-        private val map = HashMap<Int, Pair<Array<String>?, Array<String>?>>()
+        private var map: MutableMap<Int, Pair<Array<String>?, Array<String>?>>? = null
+        private var selection: Pair<String, Array<String>>? = null
         private var sortOrder: String = Storage.DEFAULT_ORDER_BY
 
         fun setBucketId(bucketId: Long): Builder {
@@ -109,7 +121,16 @@ class MediaTypeSelection(
         }
 
         fun addMedia(mediaType: Int, filter: Array<String>? = null, ignore: Array<String>? = null): Builder {
-            map[mediaType] = filter to ignore
+            val data = map ?: mutableMapOf<Int, Pair<Array<String>?, Array<String>?>>().also { map = it }
+            data[mediaType] = filter to ignore
+            return this
+        }
+
+        /**
+         * use it as a selection to query media
+         */
+        fun selection(selection: String, selectionArgs: Array<String>): Builder {
+            this.selection = Pair(selection, selectionArgs)
             return this
         }
 
@@ -119,7 +140,7 @@ class MediaTypeSelection(
         }
 
         fun create(): MediaTypeSelection {
-            return MediaTypeSelection(bucketId, map, sortOrder)
+            return MediaTypeSelection(bucketId, map, selection, sortOrder)
         }
     }
 }
