@@ -13,6 +13,9 @@ android {
     libraryVariants.all {
         it.generateBuildConfig.enabled = false
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
