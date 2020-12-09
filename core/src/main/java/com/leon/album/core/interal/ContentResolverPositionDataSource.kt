@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Handler
 import androidx.core.content.ContentResolverCompat
 import androidx.core.os.CancellationSignal
+import androidx.core.os.OperationCanceledException
 import androidx.paging.PositionalDataSource
 import java.lang.ref.WeakReference
 
@@ -31,12 +32,11 @@ abstract class ContentResolverPositionDataSource<T : Any>(
     override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<T>) {
         var list = emptyList<T>()
 
-        val firstLoadPosition: Int
         cancellationSignal = CancellationSignal()
 
+        val firstLoadPosition = computeInitialLoadPosition(params, totalCount)
         try {
             // bound the size requested, based on known count
-            firstLoadPosition = computeInitialLoadPosition(params, totalCount)
             val firstLoadSize = computeInitialLoadSize(params, firstLoadPosition, totalCount)
             val limitOffsetSortOrder = getOffsetLimit(firstLoadPosition, firstLoadSize)
 
@@ -54,6 +54,14 @@ abstract class ContentResolverPositionDataSource<T : Any>(
 
             cursor?.use {
                 list = convertRows(it)
+            }
+        } catch (e: Exception) {
+            if (e is OperationCanceledException) {
+                // ContentResolverCompat.query() can throw a framework OperationCanceledException, ContentResolverCompat.java:87
+                // We catch that, then do nothing
+            } else {
+                // If it's not a framework OperationCanceledException, re-throw the exception
+                throw e
             }
         } finally {
             cancellationSignal = null
