@@ -14,7 +14,7 @@ So just add the dependency to your project build.gradle file:
 dependencies {
     implementation 'com.github.xyz-fly:albumcore:0.9.8'
     // it need depend on androidx-paging for new features
-    implementation 'androidx.paging:paging-runtime-ktx:3.0.0-alpha07'
+    implementation 'androidx.paging:paging-runtime-ktx:3.0.1'
 }
 ```
 # Sample usage

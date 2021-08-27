@@ -13,7 +13,7 @@ buildscript {
 }
 
 plugins {
-    id "com.diffplug.spotless" version "5.7.0"
+    id "com.diffplug.spotless" version "5.14.0"
 }
 
 allprojects {
@@ -26,9 +26,8 @@ subprojects {
     spotless {
         kotlin {
             target '**/*.kt'
-            ktlint(versions.vektlint).userData([
+            ktlint(versions.ktlint).userData([
                     "disabled_rules"      : "no-wildcard-imports",
-                    "insert_final_newline": "false",
                     "max_line_length"     : "off",
             ])
             trimTrailingWhitespace()
