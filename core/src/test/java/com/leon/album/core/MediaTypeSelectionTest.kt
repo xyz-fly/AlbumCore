@@ -2,9 +2,9 @@ package com.leon.album.core
 
 import android.provider.MediaStore
 import com.leon.album.core.interal.Storage
-import java.util.concurrent.TimeUnit
 import org.junit.Assert
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class MediaTypeSelectionTest {
 

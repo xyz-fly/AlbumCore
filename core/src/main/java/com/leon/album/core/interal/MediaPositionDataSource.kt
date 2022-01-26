@@ -8,7 +8,7 @@ import com.leon.album.core.MediaTypeSelection
 internal class MediaPositionDataSource(
     context: Context,
     selection: MediaTypeSelection
-) : ContentResolverPositionDataSource<AlbumMedia>(
+) : ContentResolverPositionPagingSource<AlbumMedia>(
     context,
     Storage.URI,
     Storage.MEDIA_PROJECTION,

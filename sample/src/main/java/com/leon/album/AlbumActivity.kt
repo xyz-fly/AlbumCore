@@ -49,7 +49,6 @@ class AlbumActivity : AppCompatActivity() {
         }
     ).flattenMerge(2)
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -78,37 +77,40 @@ class AlbumActivity : AppCompatActivity() {
             }
         }
 
-        LoaderManager.getInstance(this).initLoader(0, null, object : DirectoryCallback(
-            this,
-            MediaTypeSelection.Builder().image().video().create()
-        ) {
-            override fun onLoadComplete(
-                loader: Loader<Cursor>,
-                list: List<AlbumDirectory>
+        LoaderManager.getInstance(this).initLoader(
+            0, null,
+            object : DirectoryCallback(
+                this,
+                MediaTypeSelection.Builder().image().video().create()
             ) {
+                override fun onLoadComplete(
+                    loader: Loader<Cursor>,
+                    list: List<AlbumDirectory>
+                ) {
 
-                val count = list.sumBy { it.count }
+                    val count = list.sumBy { it.count }
 
-                val allDirectory = AlbumDirectory(
-                    0L,
-                    "All of Media",
-                    "",
-                    null,
-                    count
-                )
+                    val allDirectory = AlbumDirectory(
+                        0L,
+                        "All of Media",
+                        "",
+                        null,
+                        count
+                    )
 
-                val newList = arrayListOf(allDirectory)
-                newList.addAll(list)
-                directoryList = newList
+                    val newList = arrayListOf(allDirectory)
+                    newList.addAll(list)
+                    directoryList = newList
 
-                binding.tvTitle.text = newList[0].bucketName
-                submitList(newList[0].bucketId)
+                    binding.tvTitle.text = newList[0].bucketName
+                    submitList(newList[0].bucketId)
+                }
             }
-        })
+        )
     }
 
     private fun submitList(id: Long) {
-        clearListCh.offer(Unit)
+        clearListCh.trySend(Unit).isSuccess
         albumMediaId.value = id
     }
 }

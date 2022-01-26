@@ -15,7 +15,8 @@ class LaunchActivity : AppCompatActivity() {
             this,
             arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE
-            ), 0
+            ),
+            0
         )
     }
 

@@ -14,6 +14,11 @@ import java.lang.ref.WeakReference
 /**
  * @see [androidx.room.paging.LimitOffsetDataSource]
  */
+@Deprecated(
+    "Deprecated",
+    level = DeprecationLevel.ERROR,
+    replaceWith = ReplaceWith("ContentResolverPositionPagingSource")
+)
 abstract class ContentResolverPositionDataSource<T : Any>(
     private val context: Context,
     private val uri: Uri,
