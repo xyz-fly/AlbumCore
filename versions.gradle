@@ -114,6 +114,7 @@ ext {
 static def addRepos(RepositoryHandler handler) {
     handler.google()
     handler.mavenCentral()
+    handler.maven { url 'https://plugins.gradle.org/m2/' }
     handler.maven { url 'https://jitpack.io' }
 }
 
