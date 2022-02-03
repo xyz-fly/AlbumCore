@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/xyz-fly/AlbumCore.svg?branch=master)](https://travis-ci.com/xyz-fly/AlbumCore)
+[![Build Status](https://app.travis-ci.com/xyz-fly/AlbumCore.svg?branch=master)](https://app.travis-ci.com/xyz-fly/AlbumCore)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.xyz-fly/albumcore/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.xyz-fly/albumcore)
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![MinSdk](https://img.shields.io/badge/%20MinSdk%20-%2016%2B%20-f0ad4e.svg)](https://android-arsenal.com/api?level=16)
